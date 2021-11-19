@@ -1,20 +1,21 @@
+/*
+Covid 19 Data Exploration 
+Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+*/
+
 Select *
 From PortfolioProject..coviddeaths
 where continent is not null
 order by 3,4
 
---Select *
---From PortfolioProject..covidvax
---order by 3,4
 
-
---select the data we are going to be using
+--Select the data we are going to be using
 
 Select Location, date, total_cases, new_cases, total_deaths, population
 From PortfolioProject..coviddeaths
 order by 1,2
 
--- looking at total cases ve total deaths. 
+-- Looking at total cases vs total deaths. 
 -- Shows likelyhood of dying if you contract covid in your country.
 
 Select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as Deathpercentage
@@ -79,7 +80,9 @@ Where continent is not null
 --group by date
 order by 1,2
 
--- looking at total population vs vaccinations
+
+-- Looking at total population vs vaccinations
+-- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
 SUM(cast(vac.new_vaccinations as bigint)) over (partition by dea.location order by dea.location,
@@ -91,7 +94,7 @@ Join PortfolioProject..covidvax vac
 where dea.continent is not null
 order by 2,3
 
---use CTE
+-- Using CTE to perform Calculation on Partition By in previous query
 
 With popvsvac (continent, location, date, population, new_vaccinations, peoplevaccinated)
 as
@@ -110,7 +113,7 @@ Select*, (peoplevaccinated/population)*100
 from popvsvac
 
 -- Temp Table
--- if you need to make changes use "drop table if exists" above create table 
+-- If you need to make changes use "drop table if exists" above create table 
 --example see below
 Drop table if exists #percentpopulationvaccinated
 create Table #percentpopulationvaccinated
@@ -138,7 +141,7 @@ Select*, (peoplevaccinated/population)*100
 from #percentpopulationvaccinated
 
 
--- creating view to store data for later
+-- Creating view to store data for later
 
 create view percentpopulationvaccinated1 as
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
